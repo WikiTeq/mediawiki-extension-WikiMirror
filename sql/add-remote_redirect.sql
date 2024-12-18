@@ -6,6 +6,7 @@ CREATE TABLE /*_*/remote_redirect (
     -- DB key of redirect destination (without namespace prefix)
     rr_title varbinary(255) NOT NULL,
     -- When this record was last updated from the remote wiki (timestamp)
-    rr_updated binary(14) NOT NULL,
-    INDEX rr_ns_title (rr_namespace, rr_title)
+    rr_updated binary(14) NOT NULL
 ) /*$wgDBTableOptions*/;
+
+CREATE INDEX rr_ns_title ON /*_*/remote_redirect (rr_namespace, rr_title);

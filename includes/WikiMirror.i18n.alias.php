@@ -13,4 +13,5 @@ $specialPageAliases = [];
  */
 $specialPageAliases['en'] = [
 	'Fork' => [ 'Fork' ],
+	'Mirror' => [ 'Mirror' ],
 ];

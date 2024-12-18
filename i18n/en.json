@@ -11,6 +11,7 @@
 	"logentry-delete-mirror": "$1 {{GENDER:$2|restored}} mirrored page $3",
 	"logentry-import-fork": "$1 {{GENDER:$2|imported}} mirrored page $3 from $4",
 	"right-fork": "Create local copies of mirrored pages",
+	"action-fork": "create local copies of mirrored pages",
 	"wikimirror-action-fork": "Fork",
 	"wikimirror-action-mirror": "Mirror",
 	"wikimirror-api-error": "An unrecoverable error has occurred with the remote wiki's API.",

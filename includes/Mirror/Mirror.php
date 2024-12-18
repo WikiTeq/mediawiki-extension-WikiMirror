@@ -652,7 +652,10 @@ class Mirror {
 		$remoteWiki = $this->options->get( 'WikiMirrorRemote' );
 		if ( $remoteWiki === null ) {
 			// no remote wiki configured, so we can't mirror anything
-			wfLogWarning( '$wgWikiMirrorRemote not configured.' );
+			// in some tests a warning here will cause a failure, even though we
+			// don't want that - ContentHandlerFunctionalTest
+			wfDebugLog( 'WikiMirror', '$wgWikiMirrorRemote not configured.' );
+			// wfLogWarning( '$wgWikiMirrorRemote not configured.' );
 			return false;
 		}
 

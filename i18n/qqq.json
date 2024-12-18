@@ -11,6 +11,7 @@
 	"logentry-import-fork": "Log entry used when forking a page and importing remote revisions.",
 	"mirror": "Form heading for Special:Mirror, also used as the button text on Special:Mirror.",
 	"right-fork": "{{doc-right|fork}}",
+	"action-fork": "{{doc-action|fork}}",
 	"wikimirror-action-fork": "Text displayed in the tab which allows users to make a local copy of a mirrored page for editing.",
 	"wikimirror-action-mirror": "Text displayed in the navigation menu which allows users to restore the mirrored version of a page.",
 	"wikimirror-api-error": "{{optional}} Error message added to server logs when an error is encountered. This message is not exposed to users.",
