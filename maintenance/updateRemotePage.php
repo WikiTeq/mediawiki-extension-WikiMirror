@@ -95,6 +95,8 @@ namespace WikiMirror\Maintenance {
 				} elseif ( $finish ) {
 					$this->fatalError( 'You cannot specify --finish along with --page or --redirect' );
 				}
+			} elseif ( $pathCount === 0 && !$finish ) {
+				$this->fatalError( 'At least one of --page and --redirect is needed' );
 			}
 
 			foreach ( $paths as $type => $path ) {
