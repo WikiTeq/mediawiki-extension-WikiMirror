@@ -71,7 +71,7 @@ class SpecialMirror extends UnlistedSpecialPage {
 
 		$this->getSkin()->setRelevantTitle( $this->title );
 		$out->setRobotPolicy( 'noindex,nofollow' );
-		$out->setPageTitle( $this->msg( 'wikimirror-mirror-title', $this->title->getPrefixedText() ) );
+		$out->setPageTitleMsg( $this->msg( 'wikimirror-mirror-title', $this->title->getPrefixedText() ) );
 		$out->addModuleStyles( [ 'mediawiki.special', 'ext.WikiMirror' ] );
 		$out->addModules( 'mediawiki.misc-authed-ooui' );
 
