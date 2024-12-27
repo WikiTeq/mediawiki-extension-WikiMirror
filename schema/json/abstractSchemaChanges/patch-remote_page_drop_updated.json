@@ -1,0 +1,98 @@
+{
+    "before": {
+        "name": "remote_page",
+        "columns": [
+            {
+                "name": "rp_id",
+                "comment": "Remote ID for this page",
+                "type": "integer",
+                "options": {
+                    "unsigned": true,
+                    "notnull": true
+                }
+            },
+            {
+                "name": "rp_namespace",
+                "comment": "Remote namespace ID for this page",
+                "type": "integer",
+                "options": {
+                    "notnull": true
+                }
+            },
+            {
+                "name": "rp_title",
+                "comment": "DB key for the page (without namespace prefix)",
+                "type": "binary",
+                "options": {
+                    "length": 255,
+                    "notnull": true
+                }
+            },
+            {
+                "name": "rp_updated",
+                "comment": "When this record was last updated from the remote wiki (timestamp)",
+                "type": "mwtimestamp",
+                "options": {
+                    "notnull": true
+                }
+            }
+        ],
+        "indexes": [
+            {
+                "name": "rp_ns_title",
+                "columns": [
+                    "rp_namespace",
+                    "rp_title"
+                ],
+                "unique": true
+            }
+        ],
+        "pk": [
+            "rp_id"
+        ]
+    },
+    "after": {
+        "name": "remote_page",
+        "columns": [
+            {
+                "name": "rp_id",
+                "comment": "Remote ID for this page",
+                "type": "integer",
+                "options": {
+                    "unsigned": true,
+                    "notnull": true
+                }
+            },
+            {
+                "name": "rp_namespace",
+                "comment": "Remote namespace ID for this page",
+                "type": "integer",
+                "options": {
+                    "notnull": true
+                }
+            },
+            {
+                "name": "rp_title",
+                "comment": "DB key for the page (without namespace prefix)",
+                "type": "binary",
+                "options": {
+                    "length": 255,
+                    "notnull": true
+                }
+            }
+        ],
+        "indexes": [
+            {
+                "name": "rp_ns_title",
+                "columns": [
+                    "rp_namespace",
+                    "rp_title"
+                ],
+                "unique": true
+            }
+        ],
+        "pk": [
+            "rp_id"
+        ]
+    }
+}
