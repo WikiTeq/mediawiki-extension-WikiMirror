@@ -336,7 +336,8 @@ class Mirror {
 			return false;
 		}
 
-		if ( $page->exists() ) {
+		// Ignore titles from WikiPage::getTitle() with a WikiRemotePage
+		if ( !( $page instanceof WikiRemoteTitle ) && $page->exists() ) {
 			// page exists locally
 			$this->titleCache[$cacheKey] = 'forked';
 			return false;

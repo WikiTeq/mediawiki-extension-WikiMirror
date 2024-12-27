@@ -10,6 +10,18 @@ use WikiMirror\Compat\ReflectionHelper;
 use WikiPage;
 
 class WikiRemotePage extends WikiPage {
+
+	/**
+	 * Need a way to easily identify the titles that come from a remote page
+	 * and thus, even though they have a page id, should not be considered
+	 * to exist on the wiki
+	 *
+	 * @return WikiRemoteTitle
+	 */
+	public function getTitle(): WikiRemoteTitle {
+		return new WikiRemoteTitle( parent::getTitle() );
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -77,21 +89,4 @@ class WikiRemotePage extends WikiPage {
 		ReflectionHelper::callPrivateMethod( WikiPage::class, 'setLastEdit', $this, [ $revision ] );
 	}
 
-	/**
-	 * @inheritDoc
-	 * @throws MWException On error
-	 */
-	public function getRedirectTarget() {
-		/** @var Mirror $mirror */
-		$mirror = MediaWikiServices::getInstance()->get( 'Mirror' );
-		$status = $mirror->getCachedPage( $this->mTitle );
-		if ( !$status->isOK() ) {
-			throw new MWException( $status->getMessage() );
-		}
-
-		/** @var PageInfoResponse $pageData */
-		$pageData = $status->getValue();
-
-		return $pageData->redirect;
-	}
 }
