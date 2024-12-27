@@ -8,6 +8,7 @@ namespace WikiMirror\Service;
 use MediaWiki\Hook\MediaWikiServicesHook;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Page\PageStoreFactory;
+use MediaWiki\Page\RedirectStore;
 use MediaWiki\Rest\Handler\Helper\PageRestHelperFactory;
 use MediaWiki\Revision\RevisionLookup;
 use Wikimedia\Services\ServiceContainer;
@@ -39,6 +40,13 @@ class Hooks	implements MediaWikiServicesHook {
 			static function ( RevisionLookup $lookup, ServiceContainer $container ) {
 				return new RevisionLookupManipulator(
 					$lookup,
+					$container->getService( 'LazyMirror' )
+				);
+			} );
+		$services->addServiceManipulator( 'RedirectStore',
+			static function ( RedirectStore $store, ServiceContainer $container ) {
+				return new RedirectStoreManipulator(
+					$store,
 					$container->getService( 'LazyMirror' )
 				);
 			} );
