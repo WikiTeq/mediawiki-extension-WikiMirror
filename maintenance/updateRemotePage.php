@@ -23,22 +23,15 @@ namespace WikiMirror\Maintenance {
 			$this->setBatchSize( 50000 );
 			$this->addDescription(
 				'Update locally-stored tracking data about which pages and namespaces exist on the remote wiki.'
-				. ' This script is designed to be invoked multiple times; first with --page and --out,'
-				. ' then with --redirect and --out. Each of these invocations will generate a .sql file that should'
-				. ' be read in via the mysql cli. Finally, this script should be invoked a third time with --finish'
-				. ' after those sql files have been read in.'
+				. ' This script is designed to be invoked twice; first with --page and --out,'
+				. ' which will generate a .sql file that should'
+				. ' be read in via the mysql cli. Then, this script should be invoked a second time with --finish'
+				. ' after that sql file has been read in.'
 			);
 
 			$this->addOption(
 				'page',
 				'File path of the dump containing the page table',
-				false,
-				true
-			);
-
-			$this->addOption(
-				'redirect',
-				'File path of the dump containing the redirect table',
 				false,
 				true
 			);
@@ -72,41 +65,29 @@ namespace WikiMirror\Maintenance {
 			] );
 
 			$dumpPage = $db->tableName( 'wikimirror_page' );
-			$dumpRedirect = $db->tableName( 'wikimirror_redirect' );
 
-			$paths = [
-				'page' => $this->getOption( 'page' ),
-				'redirect' => $this->getOption( 'redirect' )
-			];
+			$pagePath = $this->getOption( 'page' );
 
 			$replacements = [
 				'`page`' => $dumpPage,
-				'`redirect`' => $dumpRedirect
 			];
 
 			$out = $this->getOption( 'out' );
 			$finish = $this->hasOption( 'finish' );
-			$pathCount = count( array_filter( $paths ) );
-			if ( $pathCount === 2 ) {
-				$this->fatalError( 'You cannot specify both --page and --redirect in the same invocation' );
-			} elseif ( $pathCount === 1 ) {
+			if ( $pagePath ) {
 				if ( $out === null ) {
-					$this->fatalError( 'The --out option is required when specifying --page or --redirect' );
+					$this->fatalError( 'The --out option is required when specifying --page' );
 				} elseif ( $finish ) {
-					$this->fatalError( 'You cannot specify --finish along with --page or --redirect' );
+					$this->fatalError( 'You cannot specify --finish along with --page' );
 				}
-			} elseif ( $pathCount === 0 && !$finish ) {
-				$this->fatalError( 'At least one of --page and --redirect is needed' );
+			} elseif ( !$finish ) {
+				$this->fatalError( 'One of --page or --finish is needed' );
 			}
 
-			foreach ( $paths as $type => $path ) {
-				if ( $path === null ) {
-					continue;
-				}
-
-				$this->outputChanneled( "Loading {$type} data..." );
-				$this->fetchFromDump( $path, $replacements, $out );
-				$this->outputChanneled( "{$type} data loaded successfully!" );
+			if ( $pagePath ) {
+				$this->outputChanneled( "Loading page data..." );
+				$this->fetchFromDump( $pagePath, $replacements, $out );
+				$this->outputChanneled( "page data loaded successfully!" );
 			}
 
 			if ( $finish ) {
