@@ -2,6 +2,7 @@
 
 namespace WikiMirror\Mirror;
 
+use InvalidArgumentException;
 use MediaWiki\Config\ServiceOptions;
 use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Interwiki\InterwikiLookup;
@@ -26,7 +27,8 @@ class Mirror {
 		'ScriptPath',
 		'Server',
 		'TranscludeCacheExpiry',
-		'WikiMirrorRemote'
+		'WikiMirrorRemote',
+		'WikiMirrorNamespaces',
 	];
 
 	/** @var string Group for process cache (600 entries stored) */
@@ -238,6 +240,25 @@ class Mirror {
 	}
 
 	/**
+	 * Determine whether this page is in a namespace that might be mirrored,
+	 * based only on $wgWikiMirrorNamespaces - there are additional restrictions
+	 * from isLegalTitleForMirroring(), this is just to support the added
+	 * configuration option.
+	 *
+	 * @param PageIdentity|int $page the page or the namespace
+	 * @return bool True if the page might be mirrored
+	 */
+	public function inMirroredNamespace( PageIdentity|int $page ) {
+		$allowed = $this->options->get( 'WikiMirrorNamespaces' );
+		if ( $allowed === [] ) {
+			// No limitation
+			return true;
+		}
+		$ns = is_int( $page ) ? $page : $page->getNamespace();
+		return in_array( $ns, $allowed, true );
+	}
+
+	/**
 	 * Determine whether this Title is completely ineligible for mirroring,
 	 * without checking if it exists anywhere.
 	 *
@@ -264,6 +285,9 @@ class Mirror {
 	 * @return bool
 	 */
 	public function isForked( PageIdentity $page ) {
+		if ( !$this->inMirroredNamespace( $page ) ) {
+			return false;
+		}
 		// prime the title cache
 		$this->canMirror( $page, true );
 
@@ -282,6 +306,12 @@ class Mirror {
 	 */
 	public function getMirrorPageRecord( int $namespace, string $dbKey ): ?MirrorPageRecord {
 		$cacheKey = "{$namespace}:{$dbKey}";
+		if ( !$this->inMirroredNamespace( $namespace ) ) {
+			throw new InvalidArgumentException(
+				"Called for $cacheKey, but mirroring is not enabled for that namespace"
+			);
+		}
+
 		if ( array_key_exists( $cacheKey, $this->pageRecordCache ) ) {
 			return $this->pageRecordCache[$cacheKey];
 		}
@@ -316,6 +346,9 @@ class Mirror {
 	 * @return bool True if the title can be mirrored, false if not.
 	 */
 	public function canMirror( PageIdentity $page, bool $fast = false ) {
+		if ( !$this->inMirroredNamespace( $page ) ) {
+			return false;
+		}
 		$cacheKey = $this->titleFormatter->getPrefixedText( $page );
 
 		if ( isset( $this->titleCache[$cacheKey] ) ) {
@@ -504,6 +537,11 @@ class Mirror {
 	 * @see Mirror::getCachedText()
 	 */
 	private function getLiveText( PageIdentity $page ) {
+		if ( !$this->inMirroredNamespace( $page ) ) {
+			throw new InvalidArgumentException(
+				"Called for $page, but mirroring is not enabled for that namespace"
+			);
+		}
 		$status = $this->getCachedPage( $page );
 		if ( !$status->isOK() ) {
 			return null;
@@ -552,6 +590,11 @@ class Mirror {
 	 * @see Mirror::getCachedPage()
 	 */
 	private function getLivePage( PageIdentity $page ) {
+		if ( !$this->inMirroredNamespace( $page ) ) {
+			throw new InvalidArgumentException(
+				"Called for $page, but mirroring is not enabled for that namespace"
+			);
+		}
 		// We say that the title can be mirrored if:
 		// 1. The title exists on the remote wiki
 		// 2. It is not a sensitive page (MediaWiki:*, user css/js/json pages)

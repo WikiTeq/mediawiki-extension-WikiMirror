@@ -18,6 +18,7 @@
 	"wikimirror-config-assignknownusers": "When forking pages, whether or not imported revisions will be assigned to local users should their username match",
 	"wikimirror-config-remote": "Interwiki prefix of the remote wiki",
 	"wikimirror-config-searchmaxresults": "When performing a search against the mirrored site, the maximum number of results to fetch",
+	"wikimirror-config-namespaces": "Namespaces to mirror, leave empty for all. Note that NS_MEDIAWIKI, NS_FILE, NS_PROJECT, and NS_PROJECT_TALK are never mirrored, and neither are user config pages.",
 	"wikimirror-delete-success": "The mirrored page \"$1\" has been deleted and may now be created locally. See $2 for a record of recent deletions.",
 	"wikimirror-desc": "Mirror and fork remote wiki articles",
 	"wikimirror-extensionname": "WikiMirror",
@@ -35,7 +36,9 @@
 	"wikimirror-no-edit": "You may not edit a mirrored page; it must be forked first.",
 	"wikimirror-no-mirror": "Unable to mirror $1. It may not exist on the remote wiki or may be a sensitive page.",
 	"wikimirror-nofork-text": "The specified page cannot be forked. It may already exist locally or it may not exist remotely.",
+	"wikimirror-nofork-text-namespace": "The specified page cannot be forked, since it is not in a mirrored namespace.",
 	"wikimirror-nofork-title": "Cannot fork",
 	"wikimirror-nomirror-text": "The specified page cannot be mirrored. It must have been previously forked and subsequently deleted.",
+	"wikimirror-nomirror-text-namespace": "The specified page cannot be mirrored, since it is not in a mirrored namespace.",
 	"wikimirror-nomirror-title": "Cannot mirror"
 }

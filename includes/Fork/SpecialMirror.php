@@ -66,6 +66,10 @@ class SpecialMirror extends UnlistedSpecialPage {
 		// check if this title is currently forked and deleted
 		// if either is false, we cannot re-mirror it
 		if ( !$this->mirror->isForked( $this->title ) || $this->title->exists() ) {
+			// Have a more helpful message for pages in the wrong namespace
+			if ( !$this->mirror->inMirroredNamespace( $this->title ) ) {
+				throw new ErrorPageError( 'wikimirror-nomirror-title', 'wikimirror-nomirror-text-namespace' );
+			}
 			throw new ErrorPageError( 'wikimirror-nomirror-title', 'wikimirror-nomirror-text' );
 		}
 

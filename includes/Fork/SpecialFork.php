@@ -101,6 +101,10 @@ class SpecialFork extends UnlistedSpecialPage {
 		// check if this title is currently being mirrored;
 		// if not we can't fork it
 		if ( !$this->mirror->canMirror( $this->title ) ) {
+			// Have a more helpful message for pages in the wrong namespace
+			if ( !$this->mirror->inMirroredNamespace( $this->title ) ) {
+				throw new ErrorPageError( 'wikimirror-nofork-title', 'wikimirror-nofork-text-namespace' );
+			}
 			throw new ErrorPageError( 'wikimirror-nofork-title', 'wikimirror-nofork-text' );
 		}
 

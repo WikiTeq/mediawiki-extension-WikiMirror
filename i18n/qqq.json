@@ -18,6 +18,7 @@
 	"wikimirror-config-assignknownusers": "{{optional}} Description of the configuration variable $wgWikiMirrorAssignKnownUsers. This message is not exposed to users.",
 	"wikimirror-config-remote": "{{optional}} Description of the configuration variable $wgWikiMirrorRemote. This message is not exposed to users.",
 	"wikimirror-config-searchmaxresults": "{{optional}} Description of the configuration variable $wgWikiMirrorSearchMaxResults. This message is not exposed to users.",
+	"wikimirror-config-namespaces": "{{optional}} Description of the configuration variable $wgWikiMirrorNamespaces. This message is not exposed to users.",
 	"wikimirror-delete-success": "Success message displayed when a page is forked without importing any revisions.",
 	"wikimirror-desc": "{{desc|name=WikiMirror|url=https://www.mediawiki.org/wiki/Extension:WikiMirror}}",
 	"wikimirror-extensionname": "{{name}}",
@@ -35,7 +36,9 @@
 	"wikimirror-no-edit": "Message displayed to users when they click View Source to view the wikitext of a mirrored page.",
 	"wikimirror-no-mirror": "{{optional}} Error message added to server logs when an error is encountered. This message is not exposed to users. $1 is the name of the page.",
 	"wikimirror-nofork-text": "Error message displayed when the page cannot be forked.",
+	"wikimirror-nofork-text-namespace": "Error message displayed when the page cannot be forked because of the namespace.",
 	"wikimirror-nofork-title": "Header displayed when the page cannot be forked.",
 	"wikimirror-nomirror-text": "Error message displayed when the page cannot be mirrored.",
+	"wikimirror-nomirror-text-namespace": "Error message displayed when the page cannot be mirrored because of the namespace.",
 	"wikimirror-nomirror-title": "Header displayed when the page cannot be mirrored."
 }
