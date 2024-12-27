@@ -30,6 +30,13 @@
 			"description": "When performing a search against the mirrored site, the maximum number of results to fetch",
 			"descriptionmsg": "wikimirror-config-searchmaxresults",
 			"public": true
+		},
+		"WikiMirrorNamespaces": {
+			"value": [ 0 ],
+			"path": false,
+			"description": "Namespaces to mirror, leave empty for all. Note that NS_MEDIAWIKI, NS_FILE, NS_PROJECT, and NS_PROJECT_TALK are never mirrored, and neither are user config pages.",
+			"descriptionmsg": "wikimirror-config-namespaces",
+			"public": true
 		}
 	},
 	"Hooks": {
