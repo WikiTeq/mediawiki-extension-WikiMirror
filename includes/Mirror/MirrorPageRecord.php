@@ -14,8 +14,9 @@ use WikiMirror\API\PageInfoResponse;
 
 class MirrorPageRecord extends PageIdentityValue implements ExistingPageRecord {
 	/**
-	 * Fields that must be present in the constructor.
-	 * Various rr_* fields are all optional since they might be null.
+	 * Fields that must be present in the constructor. Only the fields from
+	 * remote_page are used, remote_redirect usage was dropped so that the
+	 * remote_page table won't need to have the correct page ids.
 	 */
 	public const REQUIRED_FIELDS = [
 		'rp_id',
@@ -60,7 +61,7 @@ class MirrorPageRecord extends PageIdentityValue implements ExistingPageRecord {
 	 * @inheritDoc
 	 */
 	public function isRedirect() {
-		return isset( $this->row->rr_from );
+		return $this->getPageInfo()->redirect !== null;
 	}
 
 	/**

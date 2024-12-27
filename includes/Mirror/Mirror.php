@@ -320,7 +320,6 @@ class Mirror {
 		$row = $dbr->newSelectQueryBuilder()
 			->select( '*' )
 			->from( 'remote_page' )
-			->leftJoin( 'remote_redirect', null, 'rp_id = rr_from' )
 			->where( [
 				'rp_namespace' => $namespace,
 				'rp_title' => $dbKey
