@@ -18,6 +18,4 @@ Assuming that your remote wiki is the English wikipedia
     where the value for `--page` is the path to the dump
 * run `php maintenance/run sql extensions/WikiMirror/pages.sql` to load the script
 
-Repeat with the `redirect` table dump, substituting `--page` with `--redirect`
-
 * run `php maintenance/run WikiMirror:updateRemotePage --finish`

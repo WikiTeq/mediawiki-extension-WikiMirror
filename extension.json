@@ -41,7 +41,6 @@
 	},
 	"Hooks": {
 		"ApiCheckCanExecute": "api",
-		"APIGetAllowedParams": "api",
 		"ApiMain::moduleManager": "api",
 		"ApiMakeParserOptions": "api",
 		"APIQueryAfterExecute": "api",
@@ -61,7 +60,6 @@
 		"api": {
 			"class": "WikiMirror\\API\\Hooks",
 			"services": [
-				"DBLoadBalancer",
 				"Mirror"
 			]
 		},
