@@ -19,8 +19,11 @@ class Hooks implements LoadExtensionSchemaUpdatesHook {
 	 * @param DatabaseUpdater $updater DatabaseUpdater subclass
 	 */
 	public function onLoadExtensionSchemaUpdates( $updater ) {
-		$updater->addExtensionTable( 'forked_titles', __DIR__ . '/../../schema/sql/forked_titles.sql' );
-		$updater->addExtensionTable( 'remote_page', __DIR__ . '/../../schema/sql/remote_page.sql' );
-		$updater->addExtensionTable( 'remote_redirect', __DIR__ . '/../../schema/sql/remote_redirect.sql' );
+		$sqlDir = __DIR__ . '/../../schema/sql';
+		$updater->addExtensionTable( 'forked_titles', $sqlDir . '/forked_titles.sql' );
+		$updater->addExtensionTable( 'remote_page', $sqlDir . '/remote_page.sql' );
+		$updater->addExtensionTable( 'remote_redirect', $sqlDir . '/remote_redirect.sql' );
+
+		$updater->dropExtensionField( 'remote_page', 'rp_updated', $sqlDir . '/patch-remote_page_drop_updated.sql' );
 	}
 }

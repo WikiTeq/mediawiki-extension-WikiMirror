@@ -6,7 +6,6 @@ CREATE TABLE /*_*/remote_page (
   rp_id INT UNSIGNED NOT NULL,
   rp_namespace INT NOT NULL,
   rp_title VARBINARY(255) NOT NULL,
-  rp_updated BINARY(14) NOT NULL,
   UNIQUE INDEX rp_ns_title (rp_namespace, rp_title),
   PRIMARY KEY(rp_id)
 ) /*$wgDBTableOptions*/;

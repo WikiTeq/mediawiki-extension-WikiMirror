@@ -27,14 +27,6 @@
                     "length": 255,
                     "notnull": true
                 }
-            },
-            {
-                "name": "rp_updated",
-                "comment": "When this record was last updated from the remote wiki (timestamp)",
-                "type": "mwtimestamp",
-                "options": {
-                    "notnull": true
-                }
             }
         ],
         "indexes": [

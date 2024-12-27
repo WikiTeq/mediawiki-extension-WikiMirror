@@ -10,8 +10,6 @@ CREATE TABLE /*_*/remote_page2 (
     rp_namespace int NOT NULL,
     -- DB key for the page (without namespace prefix)
     rp_title varbinary(255) NOT NULL,
-    -- When this record was last updated from the remote wiki (timestamp)
-    rp_updated binary(14) NOT NULL,
     UNIQUE KEY rp_ns_title (rp_namespace, rp_title)
 ) /*$wgDBTableOptions*/;
 
@@ -19,8 +17,7 @@ INSERT INTO /*_*/remote_page2
 SELECT
     page_id,
     page_namespace,
-    page_title,
-    /*$now*/
+    page_title
 FROM /*_*/wikimirror_page;
 
 DROP TABLE /*_*/wikimirror_page;
