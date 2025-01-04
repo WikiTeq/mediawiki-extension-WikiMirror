@@ -8,18 +8,18 @@ use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleArrayFromResult;
 use PaginatingSearchEngine;
 use SearchEngine;
-use WikiMirror\Mirror\Mirror;
+use WikiMirror\Mirror\RemoteApiHandler;
 
 class MirrorSearch extends SearchEngine implements PaginatingSearchEngine {
-	/** @var Mirror */
-	private Mirror $mirror;
+
+	private RemoteApiHandler $remoteApiHandler;
 
 	/** @var int */
 	private int $maxResults;
 
 	public function __construct() {
 		// As of 1.41, the ObjectFactory spec for search engines doesn't support service injection
-		$this->mirror = MediaWikiServices::getInstance()->getService( 'Mirror' );
+		$this->remoteApiHandler = MediaWikiServices::getInstance()->getService( 'WikiMirror.RemoteApiHandler' );
 		$this->maxResults = MediaWikiServices::getInstance()->getMainConfig()->get( 'WikiMirrorSearchMaxResults' );
 	}
 
@@ -67,7 +67,7 @@ class MirrorSearch extends SearchEngine implements PaginatingSearchEngine {
 		$results = [];
 
 		do {
-			$resp = $this->mirror->getRemoteApiResponse( $params, __METHOD__, true );
+			$resp = $this->remoteApiHandler->getRemoteApiResponse( $params, __METHOD__, true );
 
 			if ( $resp === false ) {
 				// search failed

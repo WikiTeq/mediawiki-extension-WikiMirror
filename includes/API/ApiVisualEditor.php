@@ -18,15 +18,19 @@ use MediaWiki\User\UserOptionsLookup;
 use MediaWiki\Watchlist\WatchlistManager;
 use Title;
 use WikiMirror\Mirror\Mirror;
+use WikiMirror\Mirror\RemoteApiHandler;
 
 class ApiVisualEditor extends \MediaWiki\Extension\VisualEditor\ApiVisualEditor {
 	/** @var Mirror */
 	private $mirror;
 
+	private RemoteApiHandler $remoteApiHandler;
+
 	/**
 	 * @param ApiMain $main
 	 * @param string $name
 	 * @param Mirror $mirror
+	 * @param RemoteApiHandler $remoteApiHandler
 	 * @param RevisionLookup $revisionLookup
 	 * @param TempUserCreator $tempUserCreator
 	 * @param UserFactory $userFactory
@@ -44,6 +48,7 @@ class ApiVisualEditor extends \MediaWiki\Extension\VisualEditor\ApiVisualEditor 
 		ApiMain $main,
 		string $name,
 		Mirror $mirror,
+		RemoteApiHandler $remoteApiHandler,
 		RevisionLookup $revisionLookup,
 		TempUserCreator $tempUserCreator,
 		UserFactory $userFactory,
@@ -58,6 +63,7 @@ class ApiVisualEditor extends \MediaWiki\Extension\VisualEditor\ApiVisualEditor 
 		VisualEditorParsoidClientFactory $parsoidClientFactory
 	) {
 		$this->mirror = $mirror;
+		$this->remoteApiHandler = $remoteApiHandler;
 		parent::__construct(
 			$main,
 			$name,
@@ -86,7 +92,7 @@ class ApiVisualEditor extends \MediaWiki\Extension\VisualEditor\ApiVisualEditor 
 		$title = Title::newFromText( $params['page'] );
 		if ( $title && $this->mirror->canMirror( $title ) ) {
 			// mirrored page, hit remote API and pass through response
-			$result = $this->mirror->getVisualEditorApi( $params );
+			$result = $this->remoteApiHandler->callVisualEditorApi( $params );
 			if ( $result === false ) {
 				// have an error of some sort
 				$this->dieWithError( 'apierror-visualeditor-docserver', 'wikimirror-visualeditor-docserver' );

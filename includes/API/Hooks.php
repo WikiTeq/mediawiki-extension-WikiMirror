@@ -80,6 +80,7 @@ class Hooks implements
 				'class' => 'WikiMirror\API\ApiVisualEditor',
 				'services' => [
 					"Mirror",
+					"WikiMirror.RemoteApiHandler",
 					"RevisionLookup",
 					"TempUserCreator",
 					"UserFactory",

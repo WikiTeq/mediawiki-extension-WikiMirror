@@ -4,7 +4,6 @@ namespace WikiMirror\Mirror;
 
 use InvalidArgumentException;
 use MediaWiki\Config\ServiceOptions;
-use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Interwiki\InterwikiLookup;
 use MediaWiki\Languages\LanguageFactory;
 use MediaWiki\Linker\LinkTarget;
@@ -23,9 +22,6 @@ use WikiMirror\API\SiteInfoResponse;
 class Mirror {
 	/** @var string[] */
 	public const CONSTRUCTOR_OPTIONS = [
-		'ArticlePath',
-		'ScriptPath',
-		'Server',
 		'TranscludeCacheExpiry',
 		'WikiMirrorRemote',
 		'WikiMirrorNamespaces',
@@ -42,9 +38,6 @@ class Mirror {
 
 	/** @var InterwikiLookup */
 	protected InterwikiLookup $interwikiLookup;
-
-	/** @var HttpRequestFactory */
-	protected HttpRequestFactory $httpRequestFactory;
 
 	/** @var WANObjectCache */
 	protected WANObjectCache $cache;
@@ -71,11 +64,12 @@ class Mirror {
 	 */
 	private array $pageRecordCache = [];
 
+	private RemoteApiHandler $remoteApiHandler;
+
 	/**
 	 * Mirror constructor.
 	 *
 	 * @param InterwikiLookup $interwikiLookup
-	 * @param HttpRequestFactory $httpRequestFactory
 	 * @param WANObjectCache $wanObjectCache
 	 * @param ILoadBalancer $loadBalancer
 	 * @param RedirectLookup $redirectLookup
@@ -83,21 +77,21 @@ class Mirror {
 	 * @param LanguageFactory $languageFactory
 	 * @param TitleFormatter $titleFormatter
 	 * @param ServiceOptions $options
+	 * @param RemoteApiHandler $remoteApiHandler
 	 */
 	public function __construct(
 		InterwikiLookup $interwikiLookup,
-		HttpRequestFactory $httpRequestFactory,
 		WANObjectCache $wanObjectCache,
 		ILoadBalancer $loadBalancer,
 		RedirectLookup $redirectLookup,
 		GlobalIdGenerator $globalIdGenerator,
 		LanguageFactory $languageFactory,
 		TitleFormatter $titleFormatter,
-		ServiceOptions $options
+		ServiceOptions $options,
+		RemoteApiHandler $remoteApiHandler
 	) {
 		$options->assertRequiredOptions( self::CONSTRUCTOR_OPTIONS );
 		$this->interwikiLookup = $interwikiLookup;
-		$this->httpRequestFactory = $httpRequestFactory;
 		$this->cache = $wanObjectCache;
 		$this->loadBalancer = $loadBalancer;
 		$this->redirectLookup = $redirectLookup;
@@ -105,6 +99,7 @@ class Mirror {
 		$this->languageFactory = $languageFactory;
 		$this->titleFormatter = $titleFormatter;
 		$this->options = $options;
+		$this->remoteApiHandler = $remoteApiHandler;
 	}
 
 	/**
@@ -223,7 +218,7 @@ class Mirror {
 			$this->options->get( 'TranscludeCacheExpiry' ),
 			function ( $oldValue, &$ttl, &$setOpts, $oldAsOf ) {
 				wfDebugLog( 'WikiMirror', "Site info not found in cache." );
-				return $this->getLiveSiteInfo();
+				return $this->remoteApiHandler->getSiteInfo();
 			},
 			[
 				'pcTTL' => $this->cache::TTL_PROC_LONG,
@@ -420,40 +415,6 @@ class Mirror {
 	}
 
 	/**
-	 * Call remote VE API and retrieve the results from it.
-	 * This is not cached.
-	 *
-	 * @param array $params Params to pass through to remote API
-	 * @return array|false API response, or false on failure
-	 */
-	public function getVisualEditorApi( array $params ) {
-		$params['action'] = 'visualeditor';
-
-		$result = $this->getRemoteApiResponse( $params, __METHOD__ );
-		if ( $result !== false ) {
-			// fix <base> tag in $result['content']
-			$base = $this->options->get( 'Server' ) .
-				str_replace( '$1', '', $this->options->get( 'ArticlePath' ) );
-
-			$result['content'] = preg_replace(
-				'#<base href=".*?"#',
-				"<base href=\"{$base}\"",
-				$result['content']
-			);
-
-			// fix load.php URLs in $result['content']
-			$script = $this->options->get( 'ScriptPath' );
-			$result['content'] = preg_replace(
-				'#="[^"]*?/load.php#',
-				"=\"{$script}/load.php",
-				$result['content']
-			);
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Convenience function to retrieve the redirect target of a potentially mirrored page.
 	 *
 	 * @param Title $title Title to retrieve redirect target for
@@ -555,15 +516,9 @@ class Mirror {
 		/** @var PageInfoResponse $pageInfo */
 		$pageInfo = $status->getValue();
 
-		$params = [
-			'action' => 'parse',
-			'oldid' => $pageInfo->lastRevisionId,
-			'prop' => 'text|langlinks|categories|modules|jsconfigvars|indicators|wikitext|properties',
-			'disablelimitreport' => true,
-			'disableeditsection' => true
-		];
-
-		return $this->getRemoteApiResponse( $params, __METHOD__ );
+		return $this->remoteApiHandler->getParsedRevision(
+			$pageInfo->lastRevisionId
+		);
 	}
 
 	/**
@@ -615,125 +570,7 @@ class Mirror {
 			return null;
 		}
 
-		// check if the remote page exists
-		$params = [
-			'action' => 'query',
-			'prop' => 'info|revisions',
-			'indexpageids' => 1,
-			'inprop' => 'displaytitle',
-			'rvdir' => 'older',
-			'rvlimit' => 1,
-			'rvprop' => 'ids|timestamp|user|userid|size|slotsize|sha1|slotsha1|contentmodel'
-				. '|flags|comment|parsedcomment|content|tags|roles',
-			'rvslots' => '*',
-			'titles' => $pageName
-		];
-
-		$data = $this->getRemoteApiResponse( $params, __METHOD__ );
-		if ( $data === false ) {
-			wfDebug( "{$pageName} could not be fetched from remote mirror." );
-			return null;
-		}
-
-		if ( isset( $data['interwiki'] ) ) {
-			// cache the failure since there's no reason to query for an interwiki multiple times.
-			wfDebug( "{$pageName} is an interwiki on remote mirror." );
-			return null;
-		}
-
-		if ( $data['pageids'][0] == '-1' ) {
-			// == instead of === is intentional; right now the API returns a string for the page id
-			// but I'd rather not rely on that behavior. This lets the -1 be coerced to int if required.
-			// This indicates the page doesn't exist on the remote, so cache that failure result.
-			wfDebug( "{$pageName} doesn't exist on remote mirror." );
-			return null;
-		}
-
-		// have an actual page id, which means the title exists on the remote
-		// cache the API response so we have the data available for future calls on the same title
-		$pageInfo = $data['pages'][0];
-
-		// check if this is a redirect, and if so fetch information about the redirect
-		if ( array_key_exists( 'redirect', $pageInfo ) && $pageInfo['redirect'] ) {
-			$params = [
-				'action' => 'query',
-				'prop' => 'info',
-				'titles' => $pageName,
-				'redirects' => true
-			];
-
-			$data = $this->getRemoteApiResponse( $params, __METHOD__ );
-			if ( !$data ) {
-				wfDebug( "Unable to fetch redirect info for {$pageName}." );
-				return null;
-			}
-
-			$pageInfo['redirect'] = $data['pages'][0];
-		}
-
-		return $pageInfo;
+		return $this->remoteApiHandler->getLivePageInfo( $pageName );
 	}
 
-	/**
-	 * Retrieve meta information about the remote wiki.
-	 *
-	 * @return false|array
-	 */
-	private function getLiveSiteInfo() {
-		$params = [
-			'action' => 'query',
-			'meta' => 'siteinfo',
-			'siprop' => 'general|namespaces|namespacealiases'
-		];
-
-		return $this->getRemoteApiResponse( $params, __METHOD__ );
-	}
-
-	/**
-	 * Execute a remote API request
-	 *
-	 * @param array $params API params
-	 * @param string $caller Pass __METHOD__
-	 * @param bool $topLevel If false (default), the returned array only includes results instead of all metadata
-	 * @return false|array
-	 */
-	public function getRemoteApiResponse( array $params, string $caller, bool $topLevel = false ) {
-		$remoteWiki = $this->options->get( 'WikiMirrorRemote' );
-		if ( $remoteWiki === null ) {
-			// no remote wiki configured, so we can't mirror anything
-			// in some tests a warning here will cause a failure, even though we
-			// don't want that - ContentHandlerFunctionalTest
-			wfDebugLog( 'WikiMirror', '$wgWikiMirrorRemote not configured.' );
-			// wfLogWarning( '$wgWikiMirrorRemote not configured.' );
-			return false;
-		}
-
-		$interwiki = $this->interwikiLookup->fetch( $remoteWiki );
-		if ( $interwiki === null || $interwiki === false ) {
-			// invalid interwiki configuration
-			wfLogWarning( 'Invalid interwiki configuration for $wgWikiMirrorRemote.' );
-			return false;
-		}
-
-		$params['format'] = 'json';
-		$params['formatversion'] = 2;
-
-		$apiUrl = $interwiki->getAPI();
-		$action = $params['action'];
-		$res = $this->httpRequestFactory->get( wfAppendQuery( $apiUrl, $params ), [], $caller );
-
-		if ( $res === null ) {
-			// API error
-			wfWarn( "Error with remote mirror API action={$action}." );
-			return false;
-		}
-
-		$data = json_decode( $res, true );
-		if ( !is_array( $data ) || !array_key_exists( $action, $data ) ) {
-			wfWarn( "Unexpected response from remote mirror API action={$action}." );
-			return false;
-		}
-
-		return $topLevel ? $data : $data[$action];
-	}
 }

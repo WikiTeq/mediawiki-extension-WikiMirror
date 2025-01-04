@@ -22,6 +22,8 @@ class CombinedSearch extends SearchEngine implements PaginatingSearchEngine {
 		$config = MediaWikiServices::getInstance()->getSearchEngineConfig();
 		$factory = MediaWikiServices::getInstance()->getSearchEngineFactory();
 
+		$this->engines = [];
+
 		foreach ( $config->getSearchTypes() as $type ) {
 			if ( $type === 'CombinedSearch' ) {
 				continue;
