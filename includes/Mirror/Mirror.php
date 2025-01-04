@@ -387,12 +387,18 @@ class Mirror {
 			return false;
 		}
 
+		// ONLY pages that are in `remote_page` are mirrored, $fast just
+		// determines if we also try to check the actual page
+		$record = $this->getMirrorPageRecord( $page->getNamespace(), $page->getDBkey() );
+		if ( $record === null ) {
+			$this->titleCache[$cacheKey] = 'not_mirrored';
+			return false;
+		}
+		$this->titleCache[$cacheKey] = 'fast_valid';
 		if ( $fast ) {
-			$result = $this->getMirrorPageRecord( $page->getNamespace(), $page->getDBkey() );
-			$exists = $result !== null;
-			$this->titleCache[$cacheKey] = $exists ? 'fast_valid' : 'fast_errored';
-			return $exists;
-		} elseif ( !$this->getCachedPage( $page )->isOK() ) {
+			return true;
+		}
+		if ( !$this->getCachedPage( $page )->isOK() ) {
 			// not able to successfully fetch the mirrored page
 			$this->titleCache[$cacheKey] = 'errored';
 			return false;
