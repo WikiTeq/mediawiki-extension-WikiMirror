@@ -147,7 +147,7 @@ END;
 	 *  - Page IDs are based on an auto-increment integer
 	 *  - Page namespace is always 0
 	 *  - Page title is from the file
-	 * 
+	 *
 	 * The dump can be gzipped, and will be extracted before being loaded.
 	 * The data is loaded to an output file to execute via the mysql cli, as
 	 * MediaWiki's facilities to execute SQL files choke on large files.
