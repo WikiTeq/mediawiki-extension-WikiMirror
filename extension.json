@@ -1,9 +1,10 @@
 {
 	"name": "WikiMirror",
 	"namemsg": "wikimirror-extensionname",
-	"version": "0.15.0",
+	"version": "0.15.0-wikiteq",
 	"author": [
-		"Ryan Schmidt"
+		"Ryan Schmidt",
+		"Daniel Scherzer"
 	],
 	"url": "https://mwusers.org",
 	"license-name": "GPL-3.0-or-later",
