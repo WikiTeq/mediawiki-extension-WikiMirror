@@ -171,6 +171,7 @@ class ReloadEnwikiDump extends Maintenance {
 	 * @param string $sqlPath
 	 */
 	private function runSQLLoad( string $sqlPath ): void {
+		// phpcs:ignore MediaWiki.NamingConventions.ValidGlobalName.allowedPrefix
 		global $IP;
 
 		$this->output( "Runing SQL from $sqlPath\n" );
