@@ -44,9 +44,7 @@ class ReloadEnwikiDump extends Maintenance {
 			return true;
 		}
 		$dumpPath = $this->downloadDump( $dump );
-		// $dumpPath = "/tmp/WikiMirror-ReloadEnwikiDump-bHKsBr";
 		$sqlPath = $this->runFirstLoad( $dumpPath );
-		// $sqlPath = "/tmp/WikiMirror-ReloadEnwikiDump-sql-B0KyJV";
 		$this->runSQLLoad( $sqlPath );
 		$this->runFinish();
 
@@ -114,6 +112,9 @@ class ReloadEnwikiDump extends Maintenance {
 				// 5 minutes should be enough? Got a timeout with 3
 				'timeout' => 60 * 5,
 				'maxTimeout' => 60 * 5,
+				// also add more time for the connection
+				'connectTimeout' => 60,
+				'maxConnectTimeout' => 60,
 			],
 			__METHOD__
 		);
