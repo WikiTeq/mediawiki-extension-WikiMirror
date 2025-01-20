@@ -40,7 +40,7 @@ class ReloadEnwikiDump extends Maintenance {
 		$dump = $this->getOption( 'dump' );
 		$current = $this->getCurrentDumpVersion();
 		if ( $dump === $current ) {
-			$this->output( "Dump is already using version $dump" );
+			$this->output( "Dump is already using version $dump\n" );
 			return true;
 		}
 		$dumpPath = $this->downloadDump( $dump );
