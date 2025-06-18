@@ -1,0 +1,9 @@
+node_modules/
+coverage/
+vendor/
+
+modules/lib/
+i18n/
+package-lock.json
+package.json
+modules/external

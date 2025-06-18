@@ -1,0 +1,41 @@
+{
+	"root": true,
+	"extends": [
+		"wikimedia/client/es6",
+		"wikimedia/jquery",
+		"wikimedia/mediawiki"
+	],
+	"globals": {
+		"exports": "writable"
+	},
+	"parserOptions": {
+		"ecmaVersion": 2020
+	},
+	"rules": {
+		"//": [
+			"off",
+			"ResourceLoader's `packageFiles` do not require wrapping but the `module` option is only available in ES6+."
+		],
+		"camelcase": "off",
+		"es-x/no-promise-prototype-finally": "off",
+		"no-implicit-globals": "off",
+		"compat/compat": "warn",
+		"mediawiki/class-doc": "off",
+		"vue/no-undef-components": [ "error" ],
+		"vue/html-self-closing": "off",
+		"vue/prop-name-casing": "warn",
+		"vue/no-unused-properties": "warn",
+		"vue/require-prop-types": "warn",
+		"vue/multi-word-component-names": "warn",
+		"max-len": [ "warn", 120 ],
+		"jsdoc/no-undefined-types": [
+			"warn",
+			{
+				"definedTypes": [
+					"Loader"
+				]
+			}
+		],
+		"prefer-arrow-callback": "off"
+	}
+}
