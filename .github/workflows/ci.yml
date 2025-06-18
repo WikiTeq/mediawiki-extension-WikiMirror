@@ -15,7 +15,7 @@ jobs:
     name: Code Style
     runs-on: ubuntu-latest
     steps:
-      - uses: wikiteq/php-lint-action@main
+      - uses: wikiteq/php-lint-action@df1989715300b0aa4bd39a41a559bc9b46497a35
 
   security:
     name: Static Analysis

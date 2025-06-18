@@ -1,0 +1,21 @@
+{
+	"name": "wikimirror",
+	"private": true,
+	"scripts": {
+		"test": "npm run lint && npm run banana",
+		"lint": "npm run lint:styles && npm run lint:js",
+		"lint:fix": "npm run lint:js:fix && npm run lint:styles:fix",
+		"lint:js": "eslint --max-warnings 0 .",
+		"lint:js:fix": "eslint . --fix",
+		"lint:styles": "stylelint modules/**/*.{vue,less,css}",
+		"lint:styles:fix": "stylelint modules/**/*.{vue,less,css} --fix",
+		"banana": "npx grunt-banana-checker i18n/"
+	},
+	"devDependencies": {
+		"eslint": "^8.45.0",
+		"grunt-banana-checker": "^0.13.0",
+		"stylelint": "^16.20.0",
+		"stylelint-config-wikimedia": "^0.18.0",
+		"eslint-config-wikimedia": "0.30.0"
+	}
+}

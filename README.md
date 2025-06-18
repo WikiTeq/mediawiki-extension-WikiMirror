@@ -39,3 +39,5 @@ wiki, but will be auto-incremented values provided by the maintenance script.
 * run `php maintenance/run sql extensions/WikiMirror/pages.sql` to load the script
 
 * run `php maintenance/run WikiMirror:updateRemotePage --finish`
+
+test1

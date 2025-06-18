@@ -9,6 +9,8 @@ class Setup {
 	 * Initializes our constants
 	 */
 	public static function callback() {
-		define( 'CONTENT_MODEL_MIRROR', 'mirror' );
+
+		define('CONTENT_MODEL_MIRROR', 'mirror');
+
 	}
 }
